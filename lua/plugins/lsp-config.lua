@@ -14,6 +14,7 @@ return {
                     "gopls",
                     "superhtml",
                     "marksman",
+                    "pylsp",
                     "jedi_language_server",
                     "textlsp",
                     "harper_ls",
