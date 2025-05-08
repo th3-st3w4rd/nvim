@@ -11,10 +11,8 @@ return {
             require("mason-lspconfig").setup({
                 ensure_installed = {
                     "lua_ls",
-                    "gopls",
                     "superhtml",
                     "marksman",
-                    "pylsp",
                     "jedi_language_server",
                     "textlsp",
                     "harper_ls",
