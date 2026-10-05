@@ -1,0 +1,118 @@
+-- -- return {
+-- --   "neovim/nvim-lspconfig",
+-- --   lazy = false, -- Load immediately at startup
+-- --   dependencies = {
+-- --     -- Core COQ plugin
+-- --     { "ms-jpq/coq_nvim", branch = "coq" },
+-- --
+-- --     -- Pre-built snippets library
+-- --     { "ms-jpq/coq.artifacts", branch = "artifacts" },
+-- --
+-- --     -- Third-party integrations (Python, Shell, Lua API, etc.)
+-- --     { "ms-jpq/coq.thirdparty", branch = "3p" },
+-- --   },
+-- --   init = function()
+-- --     -- Set global variables BEFORE the plugin loads
+-- --     vim.g.coq_settings = {
+-- --       auto_start = "shut-up", -- Options: "shut-up" (autostart silently) or true
+-- --       -- Add additional COQ settings here (e.g., keymaps, display options)
+-- --     }
+-- --   end,
+-- --   config = function()
+-- --     -- Load COQ helper function
+-- --     local coq = require("coq")
+-- --     local lspconfig = require("lspconfig")
+-- --
+-- --     -- Define your LSP servers here
+-- --     local servers = { "lua_ls", "pyright", "ts_ls" } -- Replace with your preferred servers
+-- --
+-- --     -- Wrap each server's config with coq.lspensure()
+-- --     for _, lsp in ipairs(servers) do
+-- --       lspconfig[lsp].setup(coq.lspensure({
+-- --         -- Standard lspconfig flags (e.g., on_attach, capabilities) go here
+-- --       }))
+-- --     end
+-- --   end,
+-- -- }
+-- return {
+--   -- Make coq_nvim the primary plugin entry
+--   {
+--     "ms-jpq/coq_nvim",
+--     branch = "coq",
+--     lazy = false, -- Must load on startup
+--     init = function()
+--       vim.g.coq_settings = {
+--         auto_start = "shut-up",
+--       }
+--     end,
+--   },
+--
+--   -- Snippets artifact
+--   { "ms-jpq/coq.artifacts", branch = "artifacts" },
+--
+--   -- Third-party sources
+--   { "ms-jpq/coq.thirdparty", branch = "3p" },
+--
+--   -- Configure lspconfig alongside COQ
+--   {
+--     "neovim/nvim-lspconfig",
+--     lazy = false,
+--     config = function()
+--       local coq = require("coq")
+--       local lspconfig = require("lspconfig")
+--
+--       local servers = { "lua_ls", "pyright", "ts_ls" } -- Add your LSP servers here
+--
+--       for _, lsp in ipairs(servers) do
+--         lspconfig[lsp].setup(coq.lspensure({
+--           -- Your normal server config (on_attach, capabilities, etc.) goes here
+--         }))
+--       end
+--     end,
+--   },
+return {
+  {
+    "ms-jpq/coq_nvim",
+    branch = "coq",
+    event = "VimEnter", -- Defers loading until AFTER lazy.nvim's coroutine startup finishes
+    init = function()
+      vim.g.coq_settings = {
+        auto_start = "shut-up",
+      }
+    end,
+    config = function()
+      -- COQ automatically loads its runtime, but requiring it here forces it outside coroutines
+      require("coq")
+    end,
+  },
+
+  {
+    "ms-jpq/coq.artifacts",
+    branch = "artifacts",
+    event = "VimEnter",
+  },
+
+  {
+    "ms-jpq/coq.thirdparty",
+    branch = "3p",
+    event = "VimEnter",
+  },
+
+  {
+    "neovim/nvim-lspconfig",
+    event = "VimEnter",
+    config = function()
+      local coq = require("coq")
+      local lspconfig = require("lspconfig")
+
+      local servers = { "lua_ls", "pyright", "ts_ls" } -- Replace with your LSP servers
+
+      for _, lsp in ipairs(servers) do
+        lspconfig[lsp].setup(coq.lspensure({
+          -- Standard server configs go here
+        }))
+      end
+    end,
+  },
+}
+-- }
